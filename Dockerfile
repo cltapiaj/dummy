@@ -2,9 +2,6 @@
 FROM golang:1.22-alpine AS builder
 
 WORKDIR /app
-# Copy go.mod only (since go.sum does not exist)
-COPY go.mod ./
-
 # Copy the rest of the source code
 COPY . .
 
