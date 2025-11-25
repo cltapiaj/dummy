@@ -13,8 +13,8 @@ appEnvironment: xxxxxxx
 namespace: xxxxxxx
 
 image:
-  repository: xxxxx
-  tag: xxxxx
+  repository: gcr.io
+  tag: 1.2
   version: 1
   pullPolicy: Always
 
