@@ -1,0 +1,130 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app: {{ .Values.appLabel }}
+    app.kubernetes.io/name: "{{ .Values.dummy }}"
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    tags.datadoghq.com/env:  {{ .Values.ciEnvironment }}
+    tags.datadoghq.com/service:  "{{ template "name" . }}-{{ .Values.COUNTRY }}"
+    tags.datadoghq.com/version:  {{ .Values.image.version }}
+spec:
+  progressDeadlineSeconds: 60
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      #maxSurge: 1
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.appLabel }}
+      app.kubernetes.io/name: "{{ .Values.dummy }}"
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.appLabel }}
+        app.kubernetes.io/name: "{{ .Values.dummy }}"
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        tags.datadoghq.com/env:  {{ .Values.ciEnvironment }}
+        tags.datadoghq.com/service:  "{{ template "name" . }}-{{ .Values.COUNTRY }}"
+        tags.datadoghq.com/version:  {{ .Values.image.version }}
+      annotations:
+        {{- range $key, $value := .Values.apm_datadog_annotations }}
+        {{ $key }}: {{ $value | quote }}
+        {{- end }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          command: ["/bin/sh","-c"] 
+          args: ["/app/envgonsul node /app/src/main" ]
+          env:
+          {{- if .Values.apm_datadog.enabled }}
+          - name: DD_ENV
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.labels['tags.datadoghq.com/env']
+          - name: DD_SERVICE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.labels['tags.datadoghq.com/service']
+          - name: DD_VERSION
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.labels['tags.datadoghq.com/version']       
+          - name: DD_AGENT_HOST
+            valueFrom:
+              fieldRef:
+                fieldPath: status.hostIP
+          - name: DD_PROFILING_ENABLED
+            value: "false"
+          - name: DD_LOGS_INJECTION
+            value: "true"                  
+          {{- end }}
+          - name: ENVIRONMENT
+            value: {{ .Values.ciEnvironment }}
+          - name: BUSINESS
+            value: {{ .Values.BUSINESS }}
+          - name: dummy
+            value: "{{ .Values.dummy }}"
+          - name: BRANCH
+            value: {{ .Values.ciEnvironment }}
+          - name: COUNTRY
+            value: {{ .Values.COUNTRY }}
+          - name: METRICS_SERVICE_NAME
+            value: "{{ .Values.dummy }}-{{ .Values.COUNTRY }}"
+          - name: GSM_AUTH
+            valueFrom:
+              secretKeyRef:
+                key: GSM_AUTH
+                name: secret-manager
+          - name: GCSM_PROJECT
+            valueFrom:
+              secretKeyRef:
+                key: GCSM_PROJECT
+                name: secret-manager
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.service.targetPort }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.readiness.path }}
+              port: {{ .Values.readiness.port }}
+            initialDelaySeconds: {{ .Values.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.readiness.periodSeconds }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.liveness.path }}
+              port: {{ .Values.liveness.port }}
+            initialDelaySeconds: {{ .Values.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.liveness.periodSeconds }}
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - /bin/sh
+                  - '-c'
+                  - sleep {{ .Values.terminationGracePeriod }}
+      nodeSelector:
+        iam.gke.io/gke-metadata-server-enabled: 'true'  
+      serviceAccountName: "{{ .Release.Name }}"      
+      serviceAccount: "{{ .Release.Name }}"
+      restartPolicy: Always
+      {{- with .Values.hostAliases }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
