@@ -5,12 +5,12 @@
 replicaCount: 2
 maxReplicaCount: 10
 
-COUNTRY: xxxxxxx
+COUNTRY: cl
 
-appLabel: xxxxxxx
-ciEnvironment: xxxxxxx
-appEnvironment: xxxxxxx
-namespace: xxxxxxx
+appLabel: dummy
+ciEnvironment: uat
+appEnvironment: dummy
+namespace: default
 
 image:
   repository: gcr.io
@@ -22,7 +22,7 @@ nameOverride: ''
 fullnameOverride: ''
 terminationGracePeriod: 40
 
-BUSINESS: xxxxxxx
+BUSINESS: tms
 
 service:
   type: ClusterIP
@@ -61,13 +61,6 @@ resources:
   requests:
     cpu: 150m
     memory: 200Mi
-
-virtualservice:
-  countryregex: xxxxxx
-  extgateway: xxxxxx
-  intgateway: xxxxxx
-  externalprefix: xxxxxx
-  internalprefix: xxxxxx
 
 
 nodeSelector: {}
