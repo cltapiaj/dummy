@@ -10,10 +10,6 @@ spec:
       maxUnavailable: 1
       #maxSurge: 1
   replicas: {{ .Values.replicaCount }}
-  selector:
-    matchLabels:
-      app: {{ .Values.appLabel }}
-      app.kubernetes.io/name: dummy2
   template:
     spec:
       containers:
