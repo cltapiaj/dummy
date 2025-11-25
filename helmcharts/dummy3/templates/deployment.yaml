@@ -22,28 +22,6 @@ spec:
           command: ["/bin/sh","-c"] 
           args: ["/app/envgonsul node /app/src/main" ]
           env:
-          {{- if .Values.apm_datadog.enabled }}
-          - name: DD_ENV
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.labels['tags.datadoghq.com/env']
-          - name: DD_SERVICE
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.labels['tags.datadoghq.com/service']
-          - name: DD_VERSION
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.labels['tags.datadoghq.com/version']       
-          - name: DD_AGENT_HOST
-            valueFrom:
-              fieldRef:
-                fieldPath: status.hostIP
-          - name: DD_PROFILING_ENABLED
-            value: "false"
-          - name: DD_LOGS_INJECTION
-            value: "true"                  
-          {{- end }}
           - name: ENVIRONMENT
             value: {{ .Values.ciEnvironment }}
           - name: BUSINESS
@@ -69,20 +47,6 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.service.targetPort }}
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-          readinessProbe:
-            httpGet:
-              path: {{ .Values.readiness.path }}
-              port: {{ .Values.readiness.port }}
-            initialDelaySeconds: {{ .Values.readiness.initialDelaySeconds }}
-            periodSeconds: {{ .Values.readiness.periodSeconds }}
-          livenessProbe:
-            httpGet:
-              path: {{ .Values.liveness.path }}
-              port: {{ .Values.liveness.port }}
-            initialDelaySeconds: {{ .Values.liveness.initialDelaySeconds }}
-            periodSeconds: {{ .Values.liveness.periodSeconds }}
           lifecycle:
             preStop:
               exec:
@@ -95,15 +59,3 @@ spec:
       serviceAccountName: "{{ .Release.Name }}"      
       serviceAccount: "{{ .Release.Name }}"
       restartPolicy: Always
-      {{- with .Values.hostAliases }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
