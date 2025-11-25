@@ -10,7 +10,13 @@ spec:
       maxUnavailable: 1
       #maxSurge: 1
   replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: dummy3
   template:
+      metadata:
+      labels:
+        app: dummy3
     spec:
       containers:
         - name: {{ .Chart.Name }}
