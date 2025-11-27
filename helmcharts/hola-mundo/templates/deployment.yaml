@@ -12,6 +12,10 @@ spec:
   selector:
     matchLabels:
       app: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
     spec:
       containers:
         - name: {{ .Chart.Name }}
