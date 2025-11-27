@@ -8,52 +8,15 @@ spec:
     type: RollingUpdate
     rollingUpdate:
       maxUnavailable: 1
-      #maxSurge: 1
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: dummy3
+      app: {{ .Release.Name }}
     spec:
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          command: ["/bin/sh","-c"] 
-          args: ["/app/envgonsul node /app/src/main" ]
-          env:
-          - name: ENVIRONMENT
-            value: {{ .Values.ciEnvironment }}
-          - name: BUSINESS
-            value: {{ .Values.BUSINESS }}
-          - name: dummy
-            value: "{{ .Values.dummy }}"
-          - name: BRANCH
-            value: {{ .Values.ciEnvironment }}
-          - name: COUNTRY
-            value: {{ .Values.COUNTRY }}
-          - name: METRICS_SERVICE_NAME
-            value: "{{ .Values.dummy }}-{{ .Values.COUNTRY }}"
-          - name: GSM_AUTH
-            valueFrom:
-              secretKeyRef:
-                key: GSM_AUTH
-                name: secret-manager
-          - name: GCSM_PROJECT
-            valueFrom:
-              secretKeyRef:
-                key: GCSM_PROJECT
-                name: secret-manager
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.service.targetPort }}
-          lifecycle:
-            preStop:
-              exec:
-                command:
-                  - /bin/sh
-                  - '-c'
-                  - sleep {{ .Values.terminationGracePeriod }}
-      nodeSelector:
-        iam.gke.io/gke-metadata-server-enabled: 'true'  
-      serviceAccountName: "{{ .Release.Name }}"      
-      serviceAccount: "{{ .Release.Name }}"
       restartPolicy: Always

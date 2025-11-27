@@ -3,10 +3,10 @@ kind: Service
 metadata:
   name: "{{ .Release.Name }}-service"
   labels:
-    app: {{ .Values.appLabel }}
-    app.kubernetes.io/name: "{{ .Values.dummy }}"
+    app: {{ .Release.Name }}
+    app.kubernetes.io/name: {{ .Release.Name }}
     app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/managed-by: {{ .Release.Name }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -14,6 +14,6 @@ spec:
       targetPort: {{ .Values.service.targetPort }}
       port: {{ .Values.service.port }}
   selector:
-    app: {{ .Values.appLabel }}
-    app.kubernetes.io/name: "{{ .Values.dummy }}"
+    app: {{ .Release.Name }}
+    app.kubernetes.io/name: {{ .Release.Name }}
     app.kubernetes.io/instance: {{ .Release.Name }}

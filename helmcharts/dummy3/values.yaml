@@ -1,82 +1,86 @@
-# Default values for shipments-chart.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
-
-replicaCount: 2
-maxReplicaCount: 10
-
-COUNTRY: cl
-
-appLabel: dummy
-ciEnvironment: uat
-appEnvironment: dummy
-namespace: default
+replicaCount: 1
 
 image:
-  repository: gcr.io
+  repository: gcr.io/dummy/
   tag: 1.2
-  version: 1
   pullPolicy: Always
 
-nameOverride: ''
-fullnameOverride: ''
-terminationGracePeriod: 40
-
-BUSINESS: tms
-
 service:
-  type: ClusterIP
-  name: drop-off
-  port: 80
   targetPort: 8080
-
-readiness:
-  path: /health/readiness
-  port: 8080
-  initialDelaySeconds: 10
-  periodSeconds: 20
-  timeoutSeconds: 5
-  
-liveness:
-  path: /health/liveness
-  port: 8080
-  initialDelaySeconds: 10
-  periodSeconds: 20
-  timeoutSeconds: 5
-
-secret:
-  name: xxxxxx
-  registry: xxxxxx
-  username: xxxxxx
-  password: xxxxxx
-  email: xxxxxx
-
-getsecrets:
-  secretKeys: xxxxxxxx
-
-resources:
-  limits:
-    cpu: 200m
-    memory: 300Mi
-  requests:
-    cpu: 150m
-    memory: 200Mi
+  type: ClusterIP
+  name: svc
+  port: 80
 
 
-nodeSelector: {}
 
-tolerations: []
-
-affinity: {}
-
-cmd:
-  migration: "/app/envgonsul yarn run typeorm:migration:generate && /app/envgonsul yarn run typeorm:migration:run || echo 'No migrations are pending'"
-
-apm_datadog:
-    enabled: true
-    version: v1.9.6
-    dd_logs_injections: "true"
-    dd_profiling_enabled: "true"
-apm_datadog_annotations:
-    ad.datadoghq.com/tags: '{"app":"dropoff-task","role":"backend","sre_team":"bksm_team","team": "bksm_backstore","sre_team": "sre_dfl","cc-name":"logistica","cc-id":"C098006232","country":"corp","bs-dom":"schn","ind":"rtl","bu":"corp","retention":"3d"}'
-    ad.datadoghq.com/locate-service.logs: '[{"source":"nodejs"}]'
+#
+#
+#maxReplicaCount: 10
+#
+#COUNTRY: cl
+#
+#
+#ciEnvironment: uat
+#appEnvironment: dummy
+#namespace: default
+#
+#
+#
+#nameOverride: ''
+#fullnameOverride: ''
+#terminationGracePeriod: 40
+#
+#BUSINESS: tms
+#
+#
+#
+#readiness:
+#  path: /health/readiness
+#  port: 8080
+#  initialDelaySeconds: 10
+#  periodSeconds: 20
+#  timeoutSeconds: 5
+#  
+#liveness:
+#  path: /health/liveness
+#  port: 8080
+#  initialDelaySeconds: 10
+#  periodSeconds: 20
+#  timeoutSeconds: 5
+#
+#secret:
+#  name: xxxxxx
+#  registry: xxxxxx
+#  username: xxxxxx
+#  password: xxxxxx
+#  email: xxxxxx
+#
+#getsecrets:
+#  secretKeys: xxxxxxxx
+#
+#resources:
+#  limits:
+#    cpu: 200m
+#    memory: 300Mi
+#  requests:
+#    cpu: 150m
+#    memory: 200Mi
+#
+#
+#nodeSelector: {}
+#
+#tolerations: []
+#
+#affinity: {}
+#
+#cmd:
+#  migration: "/app/envgonsul yarn run typeorm:migration:generate && /app/envgonsul yarn run typeorm:migration:run || echo 'No migrations are pending'"
+#
+#apm_datadog:
+#    enabled: true
+#    version: v1.9.6
+#    dd_logs_injections: "true"
+#    dd_profiling_enabled: "true"
+#apm_datadog_annotations:
+#    ad.datadoghq.com/tags: '{"app":"dropoff-task","role":"backend","sre_team":"bksm_team","team": "bksm_backstore","sre_team": "sre_dfl","cc-name":"logistica","cc-id":"C098006232","country":"corp","bs-dom":"schn","ind":"rtl","bu":"corp","retention":"3d"}'
+#    ad.datadoghq.com/locate-service.logs: '[{"source":"nodejs"}]'
