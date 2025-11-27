@@ -1,8 +1,8 @@
 replicaCount: 1
 
 image:
-  repository: gcr.io/dummy/
-  tag: 1.2
+  repository: cltapia/hola-mundo
+  tag: latest
   pullPolicy: Always
 
 service:
